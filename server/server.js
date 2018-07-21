@@ -12,8 +12,12 @@ finally it will call app.listen to call the server
 //path module is the build in module in node 
 
 const path=require('path');
+const http=require('http');
+
+const socketIO=require('socket.io'); 
 
 var express=require('express');
+
 
 
 const publicPath = path.join(__dirname,'../public');
@@ -21,12 +25,37 @@ const publicPath = path.join(__dirname,'../public');
 //port for heroku
 const port=process.env.PORT || 3000;
 
+//we created an express app
 var app=express();
+var server=http.createServer(app)
+/*
+now we are going to create a variable io that calls socketIO that takes only argument that is server
+with this variable io we can do anything we want in terms of emitting or listening to events
+now we are ready to accept new connections
+*/
+var io=socketIO(server);
+/*
+now when we integrated socketIO library with out code we got access to a library that is useful for client to communicate with the server
+this library is available at
+localhost:3000/socket.io/socket.io.js
+using this library at client side we can make the connection and transfer data from client to server or server to client 
+*/
 
 //console.log(__dirname + '/../public');
 //console.log(publicPath);
 
+//here we created a middle ware
 app.use(express.static(publicPath));
+
+io.on('connection', (socket) =>{
+    console.log('New user connected');
+
+     socket.on('disconnect', ()=> {
+         console.log('User was disconnected');
+     })
+
+});
+
 
 
 
@@ -35,6 +64,10 @@ app.use(express.static(publicPath));
     res.send(publicPath);
 });
 */
-app.listen(port,() => {
+//here we resistered server on a port
+//app.listen automatically call the var server=http.createServer method of http automatically passing app as argument to create server
+// without implementing http by outself
+//app.listen(port,() => {
+server.listen(port,() => {
     console.log('Server is up on port 3000');
 });
