@@ -47,8 +47,28 @@ using this library at client side we can make the connection and transfer data f
 //here we created a middle ware
 app.use(express.static(publicPath));
 
+var frm,txt;
+
 io.on('connection', (socket) =>{
     console.log('New user connected');
+
+
+    //emit is an socket method that takes 2 arguments first is event name and second is the data we want to send or whole object
+    socket.emit('newMessage',{
+        from:'Zohaib malix',
+        text:'Hey . whats up bro',
+        createAt:1289
+    });
+
+
+
+
+
+    //after challenge
+
+    socket.on('createMessage',(message)=>{
+        console.log('createMessage',message);
+    });
 
      socket.on('disconnect', ()=> {
          console.log('User was disconnected');
