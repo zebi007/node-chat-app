@@ -9,10 +9,10 @@
         socket.on('connect',()=>{
             console.log('Connected to server');
 
-             socket.emit('createMessage',{
-                 from:'Zohaib',
-                 text:'Haan mery wasty kam kar gya aye.'
-             });
+            //  socket.emit('createMessage',{
+            //      from:'Zohaib',
+            //      text:'Haan mery wasty kam kar gya aye.'
+            //  });
 
         });
 

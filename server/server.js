@@ -54,20 +54,27 @@ io.on('connection', (socket) =>{
 
 
     //emit is an socket method that takes 2 arguments first is event name and second is the data we want to send or whole object
-    socket.emit('newMessage',{
-        from:'Zohaib malix',
-        text:'Hey . whats up bro',
-        createAt:1289
-    });
+    //removed this because we have sended message to every user connected
+    // socket.emit('newMessage',{
+    //     from:'Zohaib malix',
+    //     text:'Hey . whats up bro',
+    //     createAt:1289
+    // });
 
 
 
 
 
     //after challenge
-
+    //socket is for one user while io is for all connected users
     socket.on('createMessage',(message)=>{
         console.log('createMessage',message);
+        io.emit('newMessage', {
+            from:message.from,
+            text:message.text,
+            createdAt:new Date().getTime()
+
+        });
     });
 
      socket.on('disconnect', ()=> {
