@@ -47,11 +47,26 @@ using this library at client side we can make the connection and transfer data f
 //here we created a middle ware
 app.use(express.static(publicPath));
 
-var frm,txt;
 
 io.on('connection', (socket) =>{
     console.log('New user connected');
 
+
+     //challenge
+     //1 socket.emit from admin text welcome to the chat app
+     //2 socket.broadcast.emit sended to everybody but the user who joined i.e zebi just joined the chat app
+    socket.emit('newMessage',{
+        from:'Admin',
+        text:'Welcome to the Chat App',
+        createdAt:new Date().getTime()
+    });
+
+    //2
+    socket.broadcast.emit('newMessage',{
+        from:'Admin',
+        text:'New User Joined',
+        createdAt:new Date().getTime()
+    })
 
     //emit is an socket method that takes 2 arguments first is event name and second is the data we want to send or whole object
     //removed this because we have sended message to every user connected
@@ -73,8 +88,13 @@ io.on('connection', (socket) =>{
             from:message.from,
             text:message.text,
             createdAt:new Date().getTime()
+             });
 
-        });
+        // socket.broadcast.emit('newMessage', {
+        //     from:message.from,
+        //     text:message.text,
+        //     createdAt:new Date().getTime()
+        // })
     });
 
      socket.on('disconnect', ()=> {
