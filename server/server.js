@@ -1,4 +1,4 @@
-/* this file will be the root of our node application 
+ /* this file will be the root of our node application 
 this file is gonna create a new express app
 configure the public directory
 server.js is gonna serve up the public directory
@@ -17,6 +17,8 @@ const http=require('http');
 const socketIO=require('socket.io'); 
 
 var express=require('express');
+
+const {generateMessage , generateLocationMessage} = require('./utils/message');
 
 
 
@@ -55,18 +57,30 @@ io.on('connection', (socket) =>{
      //challenge
      //1 socket.emit from admin text welcome to the chat app
      //2 socket.broadcast.emit sended to everybody but the user who joined i.e zebi just joined the chat app
-    socket.emit('newMessage',{
-        from:'Admin',
-        text:'Welcome to the Chat App',
-        createdAt:new Date().getTime()
-    });
+    // socket.emit('newMessage',{
+    //     from:'Admin',
+    //     text:'Welcome to the Chat App',
+    //     createdAt:new Date().getTime()
+    // });
+    // instead of this we will call message.js files method generateMessage to create message
+
+    socket.emit('newMessage',generateMessage('Admin','Welcome to the chat app'));
+
 
     //2
-    socket.broadcast.emit('newMessage',{
-        from:'Admin',
-        text:'New User Joined',
-        createdAt:new Date().getTime()
-    })
+    
+    // socket.broadcast.emit('newMessage',{
+    //     from:'Admin',
+    //     text:'New User Joined',
+    //     createdAt:new Date().getTime()
+    // })
+    //instead we will call message.js file's method generateMessage to create message by passing arguments
+    
+    socket.broadcast.emit('newMessage',generateMessage('Admin','New user joined'));
+
+
+
+
 
     //emit is an socket method that takes 2 arguments first is event name and second is the data we want to send or whole object
     //removed this because we have sended message to every user connected
@@ -82,13 +96,22 @@ io.on('connection', (socket) =>{
 
     //after challenge
     //socket is for one user while io is for all connected users
-    socket.on('createMessage',(message)=>{
+    //at server side for acknoledgment we need second argument a callback that is responsible to tell tha client that we got the request
+    socket.on('createMessage',(message,callback)=>{
         console.log('createMessage',message);
-        io.emit('newMessage', {
-            from:message.from,
-            text:message.text,
-            createdAt:new Date().getTime()
-             });
+        //this callback is going to send an event back to the front end and call the function inside createMessage function on index.js
+        var zeb='server'
+        callback();
+        //instead we will call message.js file's method generateMessage to create message by passing arguments
+        io.emit('newMessage', 
+            //  {
+            // from:message.from,
+            // text:message.text,
+            // createdAt:new Date().getTime()
+            //  }
+            //here we are calling method generateMessage of file message.js to create message
+            generateMessage(message.from,message.text)
+            );
 
         // socket.broadcast.emit('newMessage', {
         //     from:message.from,
@@ -96,6 +119,12 @@ io.on('connection', (socket) =>{
         //     createdAt:new Date().getTime()
         // })
     });
+
+    socket.on('createLocationMessage' , (coords) => {
+     io.emit('newLocationMessage',generateLocationMessage('Admin',coords.latitude,coords.longitude));
+    });
+
+
 
      socket.on('disconnect', ()=> {
          console.log('User was disconnected');
